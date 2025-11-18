@@ -4,7 +4,18 @@
   <meta charset="UTF-8" />
   <title>Vessel Report Form</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 16px; }
+    body <script src="https://connect-cdn.atl-paas.net/all.js"></script>
+<script>
+  AP.context.getContext(function(ctx) {
+    const issueType = ctx.jira.issue.issueType.name;
+
+    // Only show for Voyage Report
+    if (issueType !== "Voyage Report") {
+      document.body.innerHTML = "";
+    }
+  });
+</script>
+ { font-family: Arial, sans-serif; margin: 16px; }
     h2 { margin-bottom: 12px; }
 
     .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
