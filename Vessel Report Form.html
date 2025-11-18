@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Vessel Report Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; }
+    h2 { margin-bottom: 12px; }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .tab {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px 4px 0 0;
+      cursor: pointer;
+      font-size: 13px;
+      background: #f0f0f0;
+    }
+    .tab.active {
+      background: #ffffff;
+      border-bottom-color: #ffffff;
+      font-weight: bold;
+    }
+
+    .tab-content {
+      border: 1px solid #ccc;
+      border-radius: 0 4px 4px 4px;
+      padding: 12px;
+      max-width: 800px;
+    }
+
+    .field-row {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+    }
+    .field-row label {
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+    .field-row input {
+      padding: 4px 6px;
+      font-size: 13px;
+    }
+
+    #saveBtn {
+      margin-top: 12px;
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Vessel Report Form (from JSON)</h2>
+
+<div id="tabs" class="tabs"></div>
+<div id="tab-content" class="tab-content"></div>
+
+<button id="saveBtn">Save (demo)</button>
+
+<script>
+  // === THIS IS YOUR JSON, EMBEDDED IN THE PAGE ===
+  const TABS = {
+    "Identification": [
+      "Vessel Name",
+      "IMO Number",
+      "Call Sign",
+      "Report Date (UTC)",
+      "Report Time (UTC)",
+      "Local Time Zone"
+    ],
+    "Position & Movement": [
+      "Latitude",
+      "Longitude",
+      "Position Fix Method",
+      "Course Over Ground (COG)",
+      "Speed Over Ground (SOG)",
+      "Heading",
+      "Engine RPM",
+      "Propeller Pitch (%)",
+      "Navigation Status"
+    ],
+    "Distance & Voyage": [
+      "Distance Run Since Last Noon (NM)",
+      "Distance Through Water (NM)",
+      "Distance Over Ground (NM)",
+      "Time Steaming (hrs)",
+      "Time Stopped / Drifting (hrs)",
+      "Distance to Go (NM)",
+      "ETA Next Port (UTC)"
+    ],
+    "Weather & Sea": [
+      "Wind Direction",
+      "Wind Force (Beaufort)",
+      "Sea State",
+      "Swell Height (m)",
+      "Swell Direction",
+      "Current Direction",
+      "Current Speed (kn)",
+      "Visibility",
+      "Barometric Pressure (hPa)",
+      "Air Temperature (°C)",
+      "Sea Water Temperature (°C)"
+    ],
+    "Draft & Trim": [
+      "Draft Forward (m)",
+      "Draft Midship (m)",
+      "Draft Aft (m)",
+      "Trim (m)",
+      "Mean Draft (m)",
+      "Displacement (t)"
+    ],
+    "Fuel ROB": [
+      "HFO ROB (t)",
+      "VLSFO ROB (t)",
+      "ULSFO / MGO ROB (t)",
+      "MDO ROB (t)",
+      "Cylinder Oil ROB (L)",
+      "System Oil ROB (L)",
+      "Generator Oil ROB (L)",
+      "Hydraulic Oil ROB (L)",
+      "Stern Tube Oil ROB (L)"
+    ],
+    "Fuel Consumption": [
+      "HFO Consumed ME (t)",
+      "HFO Consumed AE (t)",
+      "MGO Consumed ME (t)",
+      "MGO Consumed AE (t)",
+      "Fuel Used For Boiler (t)",
+      "Cylinder Oil Consumed (L)",
+      "System Oil Consumed (L)"
+    ]
+  };
+
+  let currentTab = null;
+  const formValues = {}; // label -> value
+
+  function buildTabs() {
+    const tabsContainer = document.getElementById('tabs');
+    tabsContainer.innerHTML = '';
+
+    const tabNames = Object.keys(TABS);
+    tabNames.forEach((tabName, index) => {
+      const tab = document.createElement('div');
+      tab.className = 'tab' + (index === 0 ? ' active' : '');
+      tab.innerText = tabName;
+      tab.onclick = () => setActiveTab(tabName);
+      tabsContainer.appendChild(tab);
+    });
+
+    if (tabNames.length > 0) {
+      setActiveTab(tabNames[0]);
+    }
+  }
+
+  function setActiveTab(tabName) {
+    currentTab = tabName;
+
+    // update tab visual
+    document.querySelectorAll('.tab').forEach(t => {
+      t.classList.toggle('active', t.innerText === tabName);
+    });
+
+    const content = document.getElementById('tab-content');
+    content.innerHTML = '';
+
+    const fields = TABS[tabName];
+    fields.forEach(label => {
+      const row = document.createElement('div');
+      row.className = 'field-row';
+
+      const lab = document.createElement('label');
+      lab.innerText = label;
+      row.appendChild(lab);
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = formValues[label] || '';
+      input.onchange = (e) => {
+        formValues[label] = e.target.value;
+      };
+
+      row.appendChild(input);
+      content.appendChild(row);
+    });
+  }
+
+  document.getElementById('saveBtn').onclick = () => {
+    // DEMO: just show the collected values
+    console.log('Form values:', formValues);
+    alert('Values collected. Open browser console (F12) to see them.\nIn Jira, this part would send data to a ScriptRunner endpoint.');
+  };
+
+  // initial build
+  buildTabs();
+</script>
+
+</body>
+</html>
+
